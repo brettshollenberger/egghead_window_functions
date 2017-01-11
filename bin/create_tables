@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+mkdir -p data
+curl https://s3-us-west-1.amazonaws.com/brett-egghead/window_functions/movies.csv > data/movies.csv
+curl https://s3-us-west-1.amazonaws.com/brett-egghead/window_functions/runners.csv > data/runners.csv
+curl https://s3-us-west-1.amazonaws.com/brett-egghead/window_functions/student.zip > data/student.zip
+curl https://gist.githubusercontent.com/brettshollenberger/1a86c1418dd4f079f235d772f10a122b/raw/ef4b1990697d2d35ab6dcbb3bc115abf672982b5/create.sql > create.sql
+cd data && unzip student.zip && cd ..
+
+dropdb   postgres_101
+createdb postgres_101
+
+if [[ ! -f insert.sql ]]; then
+  touch insert.sql
+
+  echo "COPY movies FROM '`pwd`/data/movies.csv' DELIMITER ',' CSV NULL 'NA' HEADER;" >> insert.sql
+  echo "COPY runners FROM '`pwd`/data/runners.csv' DELIMITER ',' CSV NULL '-' HEADER;" >> insert.sql
+  echo "COPY students FROM '`pwd`/data/student-mat.csv' DELIMITER ';' CSV HEADER;" >> insert.sql
+fi;
+
+psql -d postgres_101 -f create.sql
+psql -d postgres_101 -f insert.sql
+
+rm -rf data && rm create.sql && rm insert.sql
