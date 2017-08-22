@@ -6,5 +6,5 @@ To setup:
 
 ```bash
 chmod +x bin/create_tables
-./create_tables
+./bin/create_tables
 ```
